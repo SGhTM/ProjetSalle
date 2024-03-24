@@ -7,79 +7,77 @@ use Illuminate\Http\Request;
 
 class CoachController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
-        //
+        $coaches=Coach::all();
+        return view('coaches.index',['coaches'=>$coaches]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
-        //
+        return view('coaches.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
+    
+        {
+            // Validate the incoming request data
+            $data = $request->validate([
+                'nom' => 'required',
+                'prenom' => 'required',
+                'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+                'emploi' => 'required',
+                'numtel' => 'required',
+                'addresse' => 'required',
+            ]);
+    
+            // Handle file upload if photo is included in the request
+            if ($request->hasFile('image')) {
+                $file = $request->file('image');
+                $extension = $file->getClientOriginalExtension();
+                $filename = time() . '.' . $extension;
+                $file->move('coaches.index', $filename);
+                $data['image'] = 'coaches.index/' . $filename;
+            }
+    
+            Coach::create($data);
+            return redirect()->route('coaches.index')->with('success', 'Coach has been created successfully.');
+        }
+    
+    
+
+    public function show($id)
     {
-        //
+        $coach = Coach::findOrFail($id);
+        return view('coaches.detail', compact('coach')); 
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Coach  $coach
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Coach $coach)
+    public function edit($id)
     {
-        //
+        $coach = Coach::findOrFail($id);
+        return view('coaches.edit', compact('coach')); 
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Coach  $coach
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Coach $coach)
+    public function update(Request $request, int $id)
     {
-        //
-    }
+        
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Coach  $coach
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Coach $coach)
-    {
-        //
-    }
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $extension = $file->getClientOriginalExtension();
+            $filename = time().'.'.$extension;
+            $file->move('coaches.index', $filename);
+            $data['image'] = 'coaches.index/' . $filename;
+        }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Coach  $coach
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Coach $coach)
+        $coach = Coach::findOrFail($id);
+        $coach->update($request->all());
+        return redirect()->route('coaches.index')->with('success', 'Coach has been updated successfully');
+    }
+    public function destroy($id)
     {
-        //
+        $coach = Coach::findOrFail($id);
+        $coach->delete();
+        return redirect()->route('coaches.index')->with('success', 'Coach has been deleted successfully');
     }
 }

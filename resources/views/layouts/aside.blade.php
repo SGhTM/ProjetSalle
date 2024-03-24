@@ -45,9 +45,9 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="" class="nav-link">
+                <a href="{{route('coaches.index')}}" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Villes</p>
+                  <p>Coaches</p>
                 </a>
               </li>
               <li class="nav-item">

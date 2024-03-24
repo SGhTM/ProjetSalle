@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\CoachController;
 use App\Http\Controllers\MembreController;
+use App\Models\Coach;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -19,3 +21,4 @@ Route::get('/', function () {
 });
 
 Route::resource('/membres', MembreController::class);
+Route::resource('/coaches', CoachController::class);

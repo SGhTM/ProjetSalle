@@ -2,84 +2,86 @@
 
 namespace App\Http\Controllers;
 
+
 use App\Models\Abonnement;
+use App\Models\Discipline;
+use App\Models\Membre;
 use Illuminate\Http\Request;
 
 class AbonnementController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $keyword = $request->input('abonnement');
+
+        $abonnements = Abonnement::when($keyword, function ($query, $keyword) {
+            return $query->where('date_debut', 'LIKE', "%$keyword%")
+                ->orWhere('date_fin', 'LIKE', "%$keyword%")
+                ->orWhere('prix_total', 'LIKE', "%$keyword%")
+                ->orWhere('valide', 'LIKE', "%$keyword%")
+                ->orWhereHas('discipline', function ($query) use ($keyword) {
+                    $query->where('nom', 'LIKE', "%$keyword%");
+                })
+                ->orWhereHas('membre', function ($query) use ($keyword) {
+                    $query->where('nom', 'LIKE', "%$keyword%");
+                });
+        })->paginate(4);
+
+        return view('abonnements.index', compact('abonnements'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
-        //
+        $disciplines = Discipline::all();
+        $membres = Membre::all();
+        return view('abonnements.create', compact('disciplines', 'membres'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
-        //
+        $this->validate($request, [
+            'date_debut' => 'required|date',
+            'date_fin' => 'required|date',
+            'discipline_id' => 'required|exists:disciplines,id',
+            'membre_id' => 'required|exists:membres,id',
+            'prix_total' => 'required|numeric',
+            'valide' => 'required|in:oui,non',
+        ]);
+
+        Abonnement::create($request->all());
+
+        return redirect()->route('abonnements.index')->with('success', 'Abonnement créé avec succès.');
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Abonnement  $abonnement
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Abonnement $abonnement)
+    public function edit($id)
     {
-        //
+        $abonnement = Abonnement::findOrFail($id);
+        $disciplines = Discipline::all();
+        $membres = Membre::all();
+        return view('abonnements.edit', compact('abonnement', 'disciplines', 'membres'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Abonnement  $abonnement
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Abonnement $abonnement)
+    public function update(Request $request, $id)
     {
-        //
+        $abonnement = Abonnement::findOrFail($id);
+
+        $this->validate($request, [
+            'date_debut' => 'required|date',
+            'date_fin' => 'required|date',
+            'discipline_id' => 'required|exists:disciplines,id',
+            'membre_id' => 'required|exists:membres,id',
+            'prix_total' => 'required|numeric',
+            'valide' => 'required|in:oui,non',
+        ]);
+
+        $abonnement->update($request->all());
+
+        return redirect()->route('abonnements.index')->with('success', 'Abonnement mis à jour avec succès.');
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Abonnement  $abonnement
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Abonnement $abonnement)
+    public function destroy($id)
     {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Abonnement  $abonnement
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Abonnement $abonnement)
-    {
-        //
+        Abonnement::findOrFail($id)->delete();
+        return redirect()->route('abonnements.index')->with('success', 'Abonnement supprimé avec succès.');
     }
 }

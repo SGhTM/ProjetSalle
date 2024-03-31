@@ -1,7 +1,10 @@
 <?php
 
 use App\Http\Controllers\CoachController;
+use App\Http\Controllers\DisciplineController;
 use App\Http\Controllers\MembreController;
+use App\Http\Controllers\AbonnementController;
+
 use App\Models\Coach;
 use Illuminate\Support\Facades\Route;
 
@@ -22,3 +25,5 @@ Route::get('/', function () {
 
 Route::resource('/membres', MembreController::class);
 Route::resource('/coaches', CoachController::class);
+Route::resource('/disciplines', DisciplineController::class);
+Route::resource('/abonnements', AbonnementController::class);

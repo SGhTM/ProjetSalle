@@ -75,47 +75,43 @@
       
 
     <div class="text-center">
-        <h1>Edit Coach</h1>
+        <h1>Edit Discipline</h1>
     </div>
-    <form action="{{ route('coaches.update',$coach->id) }}" method="post"  enctype="multipart/form-data">
+    <form action="{{ route('disciplines.update',$discipline->id) }}" method="post"  enctype="multipart/form-data">
     @csrf
     @method('put')
-    <label class="form-label"><strong>Nom :</strong></label>
-    <input type="text" class="form-control" name="nom" value="{{$coach->nom}}"/><br>
-    @error('nom')
+    <label class="form-label"><strong>Discipline :</strong></label>
+    <input type="text" class="form-control" name="discipline" value="{{$discipline->discipline}}"/><br>
+    @error('discipline')
                 <div class="alert alert-danger">{{ $message }}</div>
     @enderror
 
-    <label class="form-label"><strong>Prenom :</strong></label>
-    <input type="text" class="form-control" name="prenom" value="{{$coach->prenom}}"/><br>
-    @error('prenom')
-                <div class="alert alert-danger">{{ $message }}</div>
-    @enderror
-
-    <label class="form-label"><strong>Adresse :</strong></label>
-    <input type="text" class="form-control" name="addresse" value="{{$coach->addresse}}"/><br>
-    @error('adresse')
-                <div class="alert alert-danger">{{ $message }}</div>
-    @enderror
-
-    <label class="form-label"><strong>Numero Telephone :</strong></label>
-    <input type="text" class="form-control" name="numtel" value="{{$coach->numtel}}"/><br>
-    @error('numtel')
-                <div class="alert alert-danger">{{ $message }}</div>
-    @enderror
-
-    <label class="form-label"><strong>Emploi:</strong></label>
-    <input type="text" class="form-control" name="emploi" value="{{$coach->emploi}}"/><br>
-    @error('emploi')
+    <label class="form-label"><strong>Description :</strong></label>
+    <input type="text" class="form-control" name="description" value="{{$discipline->description}}"/><br>
+    @error('description')
                 <div class="alert alert-danger">{{ $message }}</div>
     @enderror
 
     <label class="form-label" for="image"><strong>Image :</strong></label>
-    <input type="file" class="form-control" name="image" /><br>
+    <input type="file" class="form-control" name="image" value="{{$discipline->image}}" /><br>
     @error('image')
         <div class="alert alert-danger">{{ $message }}</div>
     @enderror
-    <button type="submit" class="btn btn-primary">Modifier</button>
-    <a href="{{ route('coaches.index') }}" class="btn btn-secondary">Retourner</a>
+
+    <label class="form-label"><strong>Coach :</strong></label>
+    <select name="coach_id" class="form-control" required>
+                        @foreach($coaches as $coach)
+                            <option value="{{ $coach->id }}" {{ $coach->id == $discipline->coach_id ? 'selected' : '' }}>{{ $coach->nom }}</option>
+                        @endforeach
+                    </select>
+
+    <label class="form-label"><strong>Tarif :</strong></label>
+    <input type="text" class="form-control" name="tarif" value="{{$discipline->tarif}}"/><br>
+    @error('tarif')
+                <div class="alert alert-danger">{{ $message }}</div>
+    @enderror
+
+    <button type="submit" class="btn btn-primary">Edit</button>
+    <a href="{{ route('disciplines.index') }}" class="btn btn-secondary">Return</a>
 </form>
 @endsection
